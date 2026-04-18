@@ -1,107 +1,52 @@
----
-title: Using TypeScript
-description: An in-depth guide on configuring an Expo project with TypeScript.
----
+-import React, { useState, useEffect } from 'react';
 
-import { Collapsible } from '~/ui/components/Collapsible';
-import { Terminal } from '~/ui/components/Snippet';
-import { Step } from '~/ui/components/Step';
-import { Tab, Tabs, TabsGroup } from '~/ui/components/Tabs';
-import { CODE } from '~/ui/components/Text';
+const VideoCard = ({ video }) => {
+  const [likes, setLikes] = useState(video.likes);
+  const [hasLiked, setHasLiked] = useState(false);
 
-<TabsGroup>
+  const handleLike = () => {
+    if (!hasLiked) {
+      setLikes(likes + 1);
+      setHasLiked(true);
+      // In a real app, call an API here: updateEngagement(video.id, 'like');
+    }
+  };
 
-Expo has first-class support for [TypeScript](https://www.typescriptlang.org/). The JavaScript interface of Expo SDK is written in TypeScript.
+  return (
+    <div className="relative h-[80vh] w-full max-w-[400px] bg-black rounded-xl overflow-hidden snap-start mb-4">
+      {/* Video Element */}
+      <video 
+        src={video.url} 
+        className="h-full w-full object-cover" 
+        loop 
+        muted 
+        autoPlay 
+      />
 
-This guide provides a quick way to get started for a new project and also steps to migrate your existing JavaScript based Expo project to use TypeScript.
+      {/* Overlay UI */}
+      <div className="absolute bottom-10 left-4 text-white">
+        <h3 className="font-bold">@{video.creatorName}</h3>
+        <p className="text-sm">{video.description}</p>
+      </div>
 
-## Quick start
+      {/* Engagement Sidebar */}
+      <div className="absolute right-4 bottom-20 flex flex-col items-center gap-6 text-white">
+        <button onClick={handleLike} className="flex flex-col items-center">
+          <div className={`p-3 rounded-full ${hasLiked ? 'bg-red-500' : 'bg-gray-800'}`}>
+            ❤️
+          </div>
+          <span className="text-xs">{likes}</span>
+        </button>
+        <div className="flex flex-col items-center">
+          <div className="p-3 bg-gray-800 rounded-full">💬</div>
+          <span className="text-xs">{video.comments}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-To create a new project, use the default template which includes base TypeScript configuration, example code, and basic navigation structure:
-
-<Terminal cmd={['$ npx create-expo-app@latest --template default@sdk-55']} />
-
-After you create a new project using the command above, make sure to follow instructions from:
-
-- [Set up your environment](/get-started/set-up-your-environment/) which provides required steps for setting local development environment.
-- [Start developing](/get-started/start-developing/) which provides information on triggering a development server, file structure, and details about other features.
-
-## Migrating existing JavaScript project
-
-To migrate your existing JavaScript based project to use TypeScript, follow the instructions below:
-
-<Step label="1">
-
-### Rename files to use .tsx or .ts extension
-
-Rename files to convert them to TypeScript. For example, start with the root component file such as **App.js** and rename it to **App.tsx**:
-
-<Terminal cmd={['$ mv App.js App.tsx']} />
-
-> **info** **Tip:** Use the **.tsx** extension if the file includes React components (JSX). If the file does not include any JSX, you can use the **.ts** file extension.
-
-</Step>
-
-<Step label="2">
-
-### Install required development dependencies
-
-To install required `devDependencies` such as `typescript` and `@types/react` in **package.json**:
-
-<Tabs>
-
-<Tab label="macOS/Linux">
-
-<Terminal cmd={['$ npx expo install typescript @types/react --dev']} />
-
-</Tab>
-
-<Tab label="Windows">
-
-<Terminal cmd={['$ npx expo install typescript @types/react "--" --dev']} />
-
-</Tab>
-
-</Tabs>
-
-> **info** Alternatively, run `npx expo start` command to install `typescript` and `@types/react` dev dependencies.
-
-<Collapsible summary={<>Type checking project files with <CODE>tsc</CODE></>}>
-
-To type check your project's files run `tsc` command within the root of your project directory:
-
-<Terminal cmd={['# For npm', '$ npm run tsc', '', '# For yarn', '$ yarn tsc']} />
-
-</Collapsible>
-
-</Step>
-
-<Step label="3">
-
-### Add base configuration with tsconfig.json
-
-A project's **tsconfig.json** should extend `expo/tsconfig.base` by default. You can automatically generate a **tsconfig.json** file by running the command:
-
-<Terminal cmd={['$ npx expo customize tsconfig.json']} />
-
-The default configuration in **tsconfig.json** is user-friendly and encourages adoption. If you prefer **strict type checking** and reduce the chances of runtime errors, enable `strict` under [`compilerOptions`](https://www.typescriptlang.org/docs/handbook/compiler-options.html):
-
-```json tsconfig.json
-{
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true
-  }
-}
-```
-
-</Step>
-
-<Step label="4">
-
-### Path aliases (Optional)
-
-Expo CLI supports [path aliases](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping) in **tsconfig.json** automatically. It allows importing modules with custom aliases instead of relative paths.
+export default VideoCard;
 
 For example, to import `Button` component from **src/components/Button.tsx** using the alias **@/components/Button**, add the alias `@/*` in **tsconfig.json** and set it to the **src** directory:
 
